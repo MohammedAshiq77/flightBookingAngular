@@ -1,0 +1,20 @@
+
+<div class="flex-p" fxFlex="100%">
+    <div fxLayout="column" fxFlex="100%">
+        <div class="flex-p" style="margin-top: 10px" fxLayoutGap="2%">
+            <div fxLayout="row" fxLayoutAlign="space-between">
+                <h2 [ngClass]="{ 'alert' : data.type  === 'Alert', 
+            'success' : data.type  === 'Success'
+            }"> {{data.type}} ! </h2>
+            </div>
+            <div  fxLayout="column">
+                <label fxLayoutAlign="center"> {{data.message}} </label>
+            </div>
+            <div fxLayoutAlign="end" style="margin-top:10px">
+                <button mat-button (click) = "close()"  [ngClass]="{ 'btd-alert' : data.type  === 'Alert', 
+                                'btd-success' : data.type === 'Success'
+                }" class="mat-elevation-z12">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+#bord{
+    margin: 20px ;
+    padding: 10px;
+}
+
+#head{
+    text-shadow: red ;
+}
+
+.mat-icon{
+    -webkit-margin-top-collapse: -8px !important;
+}
+.success {
+    color: green !important;
+}
+.alert {
+    color: white;
+    background-color: #ffffff;
+    cursor: pointer;
+}
+
+.alert {
+    color: rgb(220, 5, 5) !important;
+}
+
+.error {
+    color: rgb(224, 44, 44) !important;
+}
+
+.btd-error {
+    background: linear-gradient(to right, rgb(233, 75, 88) 0%, rgba(221, 76, 8, 0.986) 100%) !important;
+    color: seashell !important;
+    line-height: 32px !important;
+}
+
+.btd-success {
+    background: linear-gradient(to right, green 0%, rgba(114, 148, 86, 0.986) 100%) !important;
+    color: seashell !important;
+    line-height: 32px !important;
+}
+
+.btd-alert {
+    background: linear-gradient(to right, rgb(255, 0, 0) 0%, rgba(202, 4, 23, 0.986) 100%) !important;
+    color: seashell !important;
+    line-height: 32px !important;
+}

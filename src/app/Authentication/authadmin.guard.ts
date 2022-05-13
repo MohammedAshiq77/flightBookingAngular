@@ -1,0 +1,23 @@
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Observable } from 'rxjs';
+import { CommonService } from '../Service/common.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthadminGuard implements CanActivate {
+  constructor(private router: Router, private authenticationService: CommonService) { }
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {
+      const uservalues = this.authenticationService.currentUserValueadmin;
+      if (!!uservalues) {      
+        return true;
+      } else {
+        this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+        return false;
+      }  }
+  
+}

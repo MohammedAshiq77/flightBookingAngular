@@ -1,0 +1,329 @@
+<mat-tab-group mat-align-tabs="center" (selectedTabChange)="onTabChanged();">
+
+    <mat-tab label="Manage Schedules">
+
+      <div class="spacer">
+        <mat-card style="padding: 25px !important; height: 400px;" fxFlex="90%" >
+                <mat-card-title>Manage Schedule</mat-card-title>
+
+          <div class="spacer1">
+
+            <mat-form-field fxFlex="30%" fxFlex.xs="90%">
+                <input matInput autocomplete="off" placeholder="Search Here..." type="text" [(ngModel)]="filter" #filterText="ngModel" name="emp1" maxlength="50" required pattern="^[a-zA-Z0-9]+$" (keydown.Tab)="applyFilter($event)" (keyup)="applyFilter($event)"  name="filter">
+                <mat-error *ngIf="filterText.errors?.['pattern']">Only numbers and alphabets are allowed</mat-error>
+            </mat-form-field>
+
+            <button mat-mini-fab color="primary" aria-label="Example icon button with a menu icon">
+              <mat-icon (click)="applyFilter($event)">search</mat-icon>
+            </button>
+          </div>
+
+          <div style="max-height: 220px;overflow-y: scroll;">
+          <table mat-table matSort [dataSource]="dataSource" style="width:100%">
+            <ng-container matColumnDef="airLineName">
+                <th mat-header-cell *matHeaderCellDef>Airline Name</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.airLineName}} </td>
+            </ng-container>
+            <ng-container matColumnDef="flightID">
+              <th mat-header-cell *matHeaderCellDef>Flight ID</th>
+              <td mat-cell *matCellDef="let element">
+                  {{element.flightID}} </td>
+          </ng-container>
+            <ng-container matColumnDef="airLineCode">
+                <th mat-header-cell *matHeaderCellDef>Airline Code</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.airLineCode}} </td>
+            </ng-container>
+            <ng-container matColumnDef="airplanType">
+                <th mat-header-cell *matHeaderCellDef>Airline Type</th>
+                <td mat-cell *matCellDef="let element">
+                  {{element.airplanType}} </td>
+            </ng-container>
+            <ng-container matColumnDef="businessFare">
+                <th mat-header-cell *matHeaderCellDef>Business Class Fare</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.businessFare}} </td>
+            </ng-container>
+            <ng-container matColumnDef="econnmyFare">
+                <th mat-header-cell *matHeaderCellDef>Economy Class Fare</th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.econnmyFare}} </td>
+            </ng-container>
+            <ng-container matColumnDef="maxSeat">
+                <th mat-header-cell *matHeaderCellDef>Maximum Seat</th>
+                <td mat-cell *matCellDef="let element"> 
+                  {{element.maxSeat}} </td>
+            </ng-container>
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let element">
+
+                  <button *ngIf="element['status']==0" class="btnsize" mat-raised-button color="warn" (click)="ManageAirlinePost(element)">Block Airline</button>
+                  <button *ngIf="element['status']==1" class="btnsize" mat-raised-button color="primary" (click)="ManageAirlinePost(element)">Un-Block Airline</button>
+
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns;sticky:true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <!-- <mat-paginator [pageSize]="5" showFirstLastButtons></mat-paginator> -->
+        </div>
+
+          </mat-card>
+        </div>
+    </mat-tab>
+
+    <mat-tab label="Manage Discounts">
+      <div class="spacer">
+        <mat-card style="padding: 25px !important;" fxFlex="70%" fxLayout="column">
+          <mat-card-title>Manage Discounts</mat-card-title>
+
+          <div fxLayoutAlign="end">
+            <button mat-raised-button *ngIf="discountflag" style="background-color: green;color: antiquewhite;" (click)="managecoupon()">Manage Coupons</button>
+            <button mat-raised-button *ngIf="!discountflag" style="background-color: green;color: antiquewhite;" (click)="managecoupon1()">Add Coupon</button>
+
+          </div>
+
+          <form *ngIf="discountflag" class="example-form" [formGroup]="ManageDiscounts"  fxLayout="column">
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Coupon ID" autocomplete="off" maxlength="5"
+                    name="couponId" formControlName="couponId" numbersOnly>
+                </mat-form-field>
+
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Coupon Code" autocomplete="off" maxlength="15"
+                    name="couponCode" formControlName="couponCode">
+                </mat-form-field>
+            </div>
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Coupon Value" autocomplete="off" numbersOnly maxlength="10"
+                    name="couponvalue" formControlName="couponvalue">
+                </mat-form-field>
+
+                <mat-form-field fxFlex="40">
+                  <mat-label>Coupon Validity</mat-label>
+                  <input matInput [matDatepicker]="picker" name="couponValidty" formControlName="couponValidty" readonly="true">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                </mat-form-field>
+            </div>
+
+            
+            <div fxLayoutGap="5%" class="spacer" fxFlex="50" fxLayoutAlign="center">
+
+              <button mat-raised-button color="warn" (click)="ManageDiscounts.reset()">Clear</button>
+
+              <button mat-raised-button color="primary" type="submit" [disabled]="!ManageDiscounts.valid" (click)="AddDiscount()">Confirm</button>
+
+            </div>
+        </form> 
+
+        <div  *ngIf="!discountflag">
+        <div class="spacer1">
+
+          <mat-form-field fxFlex="30%" fxFlex.xs="90%">
+              <input matInput autocomplete="off" placeholder="Search Here..." type="text" [(ngModel)]="filter" #filterText="ngModel" name="emp1" maxlength="50" required pattern="^[a-zA-Z0-9]+$" (keydown.Tab)="applyFilter1($event)" (keyup)="applyFilter1($event)"  name="filter">
+              <mat-error *ngIf="filterText.errors?.['pattern']">Only numbers and alphabets are allowed</mat-error>
+          </mat-form-field>
+
+          <button mat-mini-fab color="primary" aria-label="Example icon button with a menu icon">
+            <mat-icon (click)="applyFilter1($event)">search</mat-icon>
+          </button>
+        </div> 
+
+        <div style="max-height: 350px;overflow-y: scroll;">
+        <table mat-table matSort [dataSource]="dataSource1" style="width:100%">
+          <ng-container matColumnDef="couponId">
+              <th mat-header-cell *matHeaderCellDef>Coupon ID</th>
+              <td mat-cell *matCellDef="let element">
+                  {{element.couponId}} </td>
+          </ng-container>
+          <ng-container matColumnDef="couponCode">
+              <th mat-header-cell *matHeaderCellDef>Coupon Code</th>
+              <td mat-cell *matCellDef="let element">
+                  {{element.couponCode}} </td>
+          </ng-container>
+          <ng-container matColumnDef="couponvalue">
+              <th mat-header-cell *matHeaderCellDef>Coupon Value</th>
+              <td mat-cell *matCellDef="let element">
+                {{element.couponvalue}} </td>
+          </ng-container>
+          <ng-container matColumnDef="couponValidty">
+              <th mat-header-cell *matHeaderCellDef>Coupon Validity</th>
+              <td mat-cell *matCellDef="let element">
+                  {{element.couponValidty}} </td>
+          </ng-container>
+          <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let element">
+
+                <button *ngIf="element['status']==0" class="btnsize" mat-raised-button color="warn" (click)="ManageDiscountsPost(element)">Block Coupon</button>
+                <button *ngIf="element['status']==1" class="btnsize" mat-raised-button color="primary" (click)="ManageDiscountsPost(element)">Un-Block Coupon</button>
+
+              </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns1;sticky:true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns1;"></tr>
+      </table>
+      <!-- <mat-paginator [pageSize]="5" showFirstLastButtons></mat-paginator> -->
+      </div>
+    </div>
+          </mat-card>
+        </div>
+    </mat-tab>
+
+
+    <mat-tab label="Add Airlines">
+      <div class="spacer">
+        <mat-card style="padding: 25px !important;" fxFlex="70%" >
+          <mat-card-title>Add Airlines</mat-card-title>
+
+            <form class="example-form" [formGroup]="AddAirline"  fxLayout="column">
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Airline Name" autocomplete="off" upperCase maxlength="15"
+                    name="airlineName" formControlName="airlineName">
+                </mat-form-field>
+
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Airline Type" autocomplete="off" upperCase maxlength="15"
+                    name="airlinetype" formControlName="airlinetype">
+                </mat-form-field>
+            </div>
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Business Fare" autocomplete="off" numbersOnly upperCase maxlength="10"
+                    name="businessFare" formControlName="businessFare">
+                </mat-form-field>
+
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Economy Fare" autocomplete="off" numbersOnly maxlength="10"
+                    name="econnmyFare" formControlName="econnmyFare">
+                </mat-form-field>
+            </div>
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Maximum Seats" autocomplete="off" numbersOnly maxlength="4"
+                    name="maxSeat" formControlName="maxSeat">
+                </mat-form-field>
+
+                    <mat-form-field fxFlex="40">
+                      <mat-label>Select Take Off Time</mat-label>
+                      <input matInput [ngxMatDatetimePicker]="picker1" name="selectdate" formControlName="selectdate" readonly="true">
+                      <mat-datepicker-toggle matSuffix [for]="$any(picker1)"></mat-datepicker-toggle>
+                      <ngx-mat-datetime-picker #picker1></ngx-mat-datetime-picker>
+                    </mat-form-field>
+                    
+            </div>
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+
+              <button mat-raised-button color="warn" (click)="AddAirline.reset()">Clear</button>
+
+              <button mat-raised-button color="primary" type="submit" [disabled]="!AddAirline.valid" (click)="AddAirlineconfirm()">Confirm</button>
+
+            </div>
+        </form> 
+        </mat-card>
+      </div>
+        </mat-tab>
+
+
+    <mat-tab label="Manage Inventry">
+      <div class="spacer">
+        <mat-card style="padding: 25px !important;" fxFlex="70%" >
+          <mat-card-title>Manage Inventry</mat-card-title>
+
+            <form class="example-form" [formGroup]="ManageInventry"  fxLayout="column">
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+
+              <mat-form-field fxFlex="40" >
+                <mat-label>Flight Number</mat-label>
+                <input matInput
+                       aria-label="flightNumber"
+                       [matAutocomplete]="auto"
+                       name="flightNumber" formControlName="flightNumber" (focusout)="getairlineiddetails()">
+                <mat-autocomplete #auto="matAutocomplete">
+                  <mat-option *ngFor="let airlineids of filteredairlineids | async" [value]="airlineids['flightID']">
+                    <span>{{airlineids['flightID']}}</span> 
+                  </mat-option>
+                </mat-autocomplete>
+              </mat-form-field>
+
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Airline ID" autocomplete="off" readonly="true" maxlength="15"
+                    name="airLineId" formControlName="airLineId">
+                </mat-form-field>
+
+            </div>
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Depart From" autocomplete="off" maxlength="10"
+                    name="from" formControlName="from">
+                </mat-form-field>
+
+                <mat-form-field fxFlex="40">
+                  <input matInput placeholder="Going To" autocomplete="off" maxlength="10"
+                    name="to" formControlName="to">
+                </mat-form-field>
+            </div>
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+                <mat-form-field fxFlex="40">
+                  <mat-label>Departure Date</mat-label>
+                  <input matInput [ngxMatDatetimePicker]="pickerFrom" name="flightStartDateTime" formControlName="flightStartDateTime" readonly="true">
+                  <mat-datepicker-toggle matSuffix [for]="$any(pickerFrom)"></mat-datepicker-toggle>
+                  <ngx-mat-datetime-picker #pickerFrom></ngx-mat-datetime-picker>
+                </mat-form-field>
+
+                <mat-form-field fxFlex="40">
+                  <mat-label>Return Date</mat-label>
+                  <input matInput [ngxMatDatetimePicker]="pickerTo" name="flightToDateTime" formControlName="flightToDateTime" readonly="true">
+                  <mat-datepicker-toggle matSuffix [for]="$any(pickerTo)"></mat-datepicker-toggle>
+                  <ngx-mat-datetime-picker #pickerTo></ngx-mat-datetime-picker>
+                </mat-form-field>
+            </div>
+
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+              <mat-form-field fxFlex="30">
+                <input matInput placeholder="Total Business Seats" autocomplete="off" numbersOnly  maxlength="3"
+                  name="totalBusinessSeats" formControlName="totalBusinessSeats">
+              </mat-form-field>
+
+              <mat-form-field fxFlex="30">
+                <input matInput placeholder="Total Economy Seats" autocomplete="off" numbersOnly maxlength="3"
+                  name="totalNonBusinessSeats" formControlName="totalNonBusinessSeats">
+              </mat-form-field>
+
+              <mat-form-field fxFlex="30">
+                <input matInput placeholder="Flight Seat Rows" autocomplete="off" numbersOnly maxlength="2"
+                  name="flightSeatRow" formControlName="flightSeatRow">
+              </mat-form-field>
+          </div>
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+
+              <button mat-raised-button color="warn" (click)="ManageInventry.reset()">Clear</button>
+
+              <button mat-raised-button color="primary" type="submit" [disabled]="!ManageInventry.valid"  (click)="inventryconfirm()">Confirm</button>
+
+            </div>
+        </form> 
+        </mat-card>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>

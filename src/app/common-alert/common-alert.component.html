@@ -1,0 +1,10 @@
+<h1 mat-dialog-title>
+    Confirm Action
+</h1>
+<div mat-dialog-content>
+    <p>Are you sure you want to Confirm?</p>
+</div>
+<div  mat-dialog-actions fxLayoutGap ="2%" fxLayoutAlign = "end">
+    <button  mat-raised-button color="warn" (click)="onDismiss()">No</button>
+    <button  mat-raised-button color="primary" (click)="onConfirm()">Yes</button>
+</div>

@@ -1,0 +1,400 @@
+<mat-tab-group mat-align-tabs="center" (selectedTabChange)="onTabChanged();">
+    <mat-tab label="Book Airline Ticket">
+
+        <div class="spacer">
+
+            <mat-card style="padding: 25px !important;" fxFlex="70%" >
+                <mat-card-title>Book Flights</mat-card-title>
+
+                <form class="example-form" [formGroup]="BookTicket"  fxLayout="column">
+    
+                <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+                    <mat-form-field fxFlex="40" >
+                        <mat-label>Depart From</mat-label>
+                        <input matInput
+                               aria-label="fromplace"
+                               [matAutocomplete]="auto"
+                               name="fromplace" formControlName="fromplace" (focusout)="gettoplace()">
+                        <mat-autocomplete #auto="matAutocomplete">
+                          <mat-option *ngFor="let from of filteredplaces | async" [value]="from['places']">
+                            <span>{{from['places']}}</span> 
+                          </mat-option>
+                        </mat-autocomplete>
+                      </mat-form-field>
+    
+                      <mat-form-field fxFlex="40" >
+                        <mat-label>Going To</mat-label>
+                        <input matInput
+                               aria-label="toplace"
+                               [matAutocomplete]="auto1"
+                               name="toplace" formControlName="toplace" (focusout)="getflag()">
+                        <mat-autocomplete #auto1="matAutocomplete">
+                          <mat-option *ngFor="let toplace of filteredplaces1 | async" [value]="toplace['places']">
+                            <span>{{toplace['places']}}</span> 
+                          </mat-option>
+                        </mat-autocomplete>
+                      </mat-form-field>
+                      <mat-form-field appearance="fill">
+                        <mat-label>Choose a date</mat-label>
+                        <input matInput [matDatepicker]="picker" matInput [formControl]="dateFormControl">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                      </mat-form-field>
+                      <button [disabled]="!g.toplace.valid || !g.fromplace.valid ||!dateFormControl.valid" mat-mini-fab color="primary" aria-label="Example icon button with a menu icon">
+                        <mat-icon  (click)="searchplaces()">search</mat-icon>
+                      </button>
+                </div>
+
+                <div fxLayout="column" *ngIf="flag">
+                  <h2>Select Airline</h2>
+                <div  class="spacer" >
+                  <mat-card class="example-card example-ripple-container" matRipple *ngFor="let element of searchdatalist" (click)="selectairline(element)">
+                      <b>AirLineName :</b>
+                    {{element['airLineName']}} 
+                  </mat-card>
+                </div>
+              </div>
+
+          <div *ngIf="flag2" fxLayout="column">
+              <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+                <mat-form-field fxFlex="30">
+                  <input matInput placeholder="Flight Number" autocomplete="off" readonly="true"
+                    name="flightNumber" formControlName="flightNumber">
+                </mat-form-field>
+  
+                <mat-form-field fxFlex="30">
+                  <input matInput placeholder="Airline ID" autocomplete="off" readonly="true"
+                    name="airLine" formControlName="airLine">
+                </mat-form-field>
+  
+                <mat-form-field fxFlex="30">
+                  <input matInput placeholder="Airline Type" autocomplete="off" readonly="true" readonly="true"
+                    name="airLineType" formControlName="airLineType">
+                </mat-form-field>
+            </div>
+
+            <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+              <mat-form-field fxFlex="30">
+                <input matInput placeholder="Name" autocomplete="off"
+                  name="userName" formControlName="userName" readonly="true">
+              </mat-form-field>
+
+              <mat-form-field fxFlex="30">
+                <input matInput placeholder="Email" autocomplete="off" 
+                  name="userEmail" formControlName="userEmail" readonly="true">
+              </mat-form-field>
+
+              <mat-form-field fxFlex="30">
+                <mat-label>Gender</mat-label>
+                <mat-select  name="gender" formControlName="gender">
+                  <mat-option *ngFor="let gender of gender" [value]="gender['id']">
+                    {{gender['name']}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+          </div>
+
+          <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+            <mat-form-field fxFlex="30">
+              <input matInput placeholder="Age" autocomplete="off" maxlength="3" numbersOnly
+                name="age" formControlName="age">
+            </mat-form-field>
+
+            <mat-form-field fxFlex="30">
+              <input matInput placeholder="Total Seats" autocomplete="off" readonly="true"
+                name="totalseats" formControlName="totalseats">
+            </mat-form-field>
+
+            <mat-form-field fxFlex="30">
+              <input matInput placeholder="Ticket Cost" autocomplete="off" readonly="true"
+                name="ticketcost" formControlName="ticketcost">
+            </mat-form-field>
+        </div>
+
+        <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+
+          <mat-form-field fxFlex="30">
+            <mat-label>One Way Trip/ Two Way Trip</mat-label>
+            <mat-select  name="journey" formControlName="journey" (selectionChange)="journeychange($event)">
+              <mat-option *ngFor="let journey of journeys" [value]="journey['value']">
+                {{journey['viewvalue']}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field fxFlex="30">
+            <mat-label>{{trip}}</mat-label>
+            <input matInput  autocomplete="off" name="WayCost" formControlName="WayCost" >
+          </mat-form-field>
+
+          <!-- <mat-form-field  fxFlex="30">
+            <input matInput placeholder="Two Way Cost" autocomplete="off" 
+              name="twoWayCost" formControlName="twoWayCost">
+          </mat-form-field> -->
+
+          <!-- <mat-form-field fxFlex="30">
+            <input matInput placeholder="Date Of Ticket Booking" autocomplete="off" 
+              name="bookedDate" formControlName="bookedDate">
+          </mat-form-field> -->
+            <mat-form-field fxFlex="30">
+              <input matInput placeholder="Discount Coupon Code" autocomplete="off" 
+                name="couponCode" formControlName="couponCode" (focusout)="discountedPrice()">
+            </mat-form-field>
+      </div>
+
+      <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+        <mat-form-field fxFlex="30">
+          <input matInput placeholder="Discounted Ticket Price" autocomplete="off" 
+            name="discountPrice" formControlName="discountPrice" readonly="true">
+        </mat-form-field>
+
+        <mat-form-field fxFlex="30">
+          <input matInput placeholder="Total Seat Booked" autocomplete="off" 
+            name="totalBookSeats" formControlName="totalBookSeats" readonly="true">
+        </mat-form-field>
+
+        <mat-form-field fxFlex="30">
+          <input matInput placeholder="Seat Number" autocomplete="off" 
+            name="seatNumber" formControlName="seatNumber">
+            <mat-hint>A0-A50</mat-hint>
+        </mat-form-field>
+    </div>
+
+    <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+
+      <mat-form-field fxFlex="30">
+        <mat-label>Type Of Meal</mat-label>
+        <mat-select  name="meal" formControlName="meal">
+          <mat-option *ngFor="let meal of maeltype" [value]="meal['id']">
+            {{meal['name']}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+  </div>
+</div>
+                <div fxLayoutGap="5%" fxFlex="50" fxLayoutAlign="center">
+    
+                  <button mat-raised-button color="warn" (click)="BookTicket.reset(); flag=false;flag2=false;">Clear</button>
+                  <button mat-raised-button color="primary" type="submit" [disabled]="!BookTicket.valid" (click)="Ticketconfirm()">Confirm</button>
+    
+                </div>
+            </form> 
+            </mat-card>
+          </div>
+    </mat-tab>
+
+
+    <mat-tab label="Check Ticket Details">
+
+      <div class="spacer">
+        <mat-card style="padding: 25px !important;" fxFlex="70%" >
+  <mat-card-title>Ticket Details</mat-card-title>
+  <form  [formGroup]="TicketDtls" fxLayout="column">
+    <div fxLayoutGap="1%" fxFlex="50" fxLayoutAlign="center" style="margin-bottom: 2%;">
+      <mat-form-field fxFlex="50">
+        <input matInput autocomplete="off" placeholder="Enter PNR Number" type="text" formControlName="pnrsearch" 
+        name="pnrsearch" maxlength="50" required pattern="^[a-zA-Z0-9]+$"  >
+        <mat-error *ngIf="TicketDtls.controls.pnrsearch.errors?.['pattern']">Only numbers and alphabets are allowed</mat-error>
+        <mat-error *ngIf="TicketDtls.controls.pnrsearch.errors?.['required']">PNR number is required</mat-error>
+    </mat-form-field>
+    <button mat-mini-fab color="primary" [disabled]="!TicketDtls.valid" aria-label="Example icon button with a menu icon">
+      <mat-icon (click)="TicketSearch()">search</mat-icon>
+    </button>
+    </div>
+<div fxLayoutAlign="center" id="printSectionId" *ngIf="searchflag">
+    <table style="width:65%; text-align: justify;">
+      <tr  style="text-align: center;">
+        <td colspan="2" [width]="250"><h2 style="margin-bottom:3%; margin-top: 2%;">Ticket Details of PNR Number : {{pnr}}</h2></td>
+      </tr>
+      <tr>
+        <td>Name</td>
+        <td>-> {{getTicketBookedDtList['name']}}</td>
+      </tr>
+      <tr>
+        <td>Email Id</td>
+        <td>-> {{getTicketBookedDtList['email']}}</td>
+      </tr>
+      <tr>
+        <td>Age</td>
+        <td>-> {{getTicketBookedDtList['age']}}</td>
+      </tr>
+      <tr>
+        <td>Gender</td>
+        <td>-> {{getTicketBookedDtList['gender']==1?"Male":"Female"}}</td>
+      </tr>
+      <tr>
+        <td>Flight ID</td>
+        <td>-> {{getTicketBookedDtList['flightId']}}</td>
+      </tr>
+      <tr>
+        <td>Booking ID</td>
+        <td>-> {{getTicketBookedDtList['bookingId']}}</td>
+      </tr>
+      <tr>
+        <td>From Place</td>
+        <td>-> {{getTicketBookedDtList['fromPlace']}}</td>
+      </tr>
+      <tr>
+        <td>To Place</td>
+        <td>-> {{getTicketBookedDtList['toPlace']}}</td>
+      </tr>
+      <tr>
+        <td>Journey</td>
+        <td>-> {{getTicketBookedDtList['journey']==1?"One Way Journey":"Two Way Journey"}}</td>
+      </tr>
+      <tr>
+        <td>Booked Date</td>
+        <td>-> {{getTicketBookedDtList['bookedDate']}}</td>
+      </tr>
+      <tr>
+        <td>No.of Seats Booked</td>
+        <td>-> {{getTicketBookedDtList['totalBookSeats']}}</td>
+      </tr>
+      <tr>
+        <td>Ticket Cost</td>
+        <td>-> {{getTicketBookedDtList['ticketCost']}}</td>
+      </tr>
+      <tr>
+        <td>Meal</td>
+        <td>-> {{getTicketBookedDtList['meal']==1?"Veg Meal":"Non-Veg Meal"}}</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center;"><h5 style="margin-top: 5%;">This is a System generated Report regarding the PNR number : {{pnr}}</h5></td>
+
+        <!-- <td *ngIf='printflag' colspan="2" style="text-align: center;"><h5 style="margin-top: 120%;">This is a System generated Report regarding the PNR number : {{pnr}}</h5></td> -->
+      </tr>
+
+    </table>
+</div>
+<div fxLayoutAlign="center"  fxLayoutGap="1%" *ngIf="searchflag">
+<button mat-raised-button color="primary"
+style="height: 40px;"
+(click)="generatePdf(1)"
+>Print Report</button>
+<button mat-raised-button color="warn"
+style="height: 40px;"
+(click)="Cancelsearch()"
+>Cancel Ticket</button>
+<button mat-raised-button color="accent"
+style="height: 40px;"
+(click)="TicketDtls.reset();searchflag=false;"
+>Clear</button>
+</div>
+
+  </form>
+
+    </mat-card>
+  </div>    
+
+</mat-tab>
+
+    <mat-tab label="Booking History">
+
+      <div class="spacer">
+        <mat-card style="padding: 25px !important;" fxFlex="70%" >
+  <mat-card-title>Booking History</mat-card-title>
+  <form fxLayout="column">
+    <div fxLayoutGap="1%" fxFlex="50" fxLayoutAlign="center" style="margin-bottom: 2%;">
+
+    <mat-form-field  fxFlex="50">
+      <mat-label>Enter Email Address</mat-label>
+      <input type="email" matInput [formControl]="emailFormControl" [errorStateMatcher]="matcher"
+             placeholder="Ex. pat@example.com">
+      <mat-error *ngIf="emailFormControl.hasError('email') && !emailFormControl.hasError('required')">
+        Please enter a valid email address
+      </mat-error>
+      <mat-error *ngIf="emailFormControl.hasError('required')">
+        Email is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+
+    <button mat-mini-fab color="primary" [disabled]="!emailFormControl.valid" aria-label="Example icon button with a menu icon">
+      <mat-icon (click)="TicketSearchEmail()">search</mat-icon>
+    </button>
+    </div>
+
+<div fxLayoutAlign="center" id="printSectionId1" *ngIf="searchflag1" fxLayout="column">
+  <div  fxLayoutAlign="center">
+    <table style="width:65%; text-align: justify;">
+      <tr  style="text-align: center;">
+        <td colspan="3" ><h2 style="margin-bottom:3%; margin-top: 2%;">Flight Booking History of : {{getTicketHistory[0]['name']}}></h2></td>
+      </tr>
+      <tr><td [width]="180"></td>
+        <td><h3>Name</h3></td>
+        <td><h3>-> {{getTicketHistory[0]['name']}}</h3></td>
+      </tr>
+      <tr><td><h3></h3></td>
+        <td><h3>Email Id</h3></td>
+        <td><h3>-> {{getTicketHistory[0]['email']}}</h3></td>
+      </tr>
+      <tr><td><h3></h3></td>
+        <td><h3>Age</h3></td>
+        <td><h3>-> {{getTicketHistory[0]['age']}}</h3></td>
+      </tr>
+      <tr><td><h3></h3></td>
+        <td><h3>Gender</h3></td>
+        <td><h3>-> {{getTicketHistory[0]['gender']==1?"Male":"Female"}}</h3></td>
+      </tr>
+    </table>
+  </div>
+  <div>
+    <table style="width:98%; text-align: center;margin-top: 5%;">
+      <tr>
+        
+        <!-- <th>Name</th>
+        <th>Email Id</th>
+        <th>Age</th>
+        <th>Gender</th> -->
+        <th>Flight ID</th>
+        <th>Booking ID</th>
+        <th>From Place</th>
+        <th>To Place</th>
+        <th>Journey</th>
+        <th>Booked Date</th>
+        <th>No.of Seats Booked</th>
+        <th>Ticket Cost</th>
+        <th>Meal</th>
+      </tr>
+      <tr *ngFor="let element of getTicketHistory">
+        <!-- <td>{{element['name']}}</td>
+        <td>{{element['email']}}</td>
+        <td>{{element['age']}}</td>
+        <td>{{element['gender']==1?"Male":"Female"}}</td> -->
+        <td>{{element['flightId']}}</td>
+        <td>{{element['bookingId']}}</td>
+        <td>{{element['fromPlace']}}</td>
+        <td>{{element['toPlace']}}</td>
+        <td>{{element['journey']==1?"One Way Journey":"Two Way Journey"}}</td>
+        <td>{{element['bookedDate']}}</td>
+        <td>{{element['totalBookSeats']}}</td>
+        <td>{{element['ticketCost']}}</td>
+        <td>{{element['meal']==1?"Veg Meal":"Non-Veg Meal"}}</td>
+
+
+      </tr>
+<tr>
+  <td colspan="13" style="text-align: center;"><h5 style="margin-top: 5%;" id="after">This is a System generated Report for : {{getTicketHistory[0]['name']}}</h5></td>
+</tr>
+    </table>
+  </div>
+</div>
+<div fxLayoutAlign="center"  fxLayoutGap="1%" *ngIf="searchflag1">
+<button mat-raised-button color="primary"
+style="height: 40px;"
+(click)="generatePdf(2)"
+>Print Report</button>
+
+<button mat-raised-button color="accent"
+style="height: 40px;"
+(click)="emailFormControl.reset();searchflag1=false;"
+
+>Clear</button>
+</div>
+
+  </form>
+
+    </mat-card>
+  </div>        </mat-tab>
+
+  </mat-tab-group>
